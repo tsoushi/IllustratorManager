@@ -49,7 +49,7 @@ class Illustrator:
     
     # 新規作成
     @staticmethod
-    def new(name, urls=None, rank=-1, keywords=None, categoryRanks=None):
+    def new(name='', urls=None, rank=-1, keywords=None, categoryRanks=None):
         if urls is None:
             urls = []
         if keywords is None:
@@ -83,6 +83,37 @@ class Illustrator:
         illustrator.updatedAt = utility.textToDatetime(row[7])
         return illustrator
 
-    
-    
-    
+    # テキストからインスタンスを一括作成
+    @staticmethod
+    def fromText(text):
+        lines = text.split('\n')
+        state = 'ready'
+        illustrators = []
+        illustrator = None
+        for line in lines:
+            if state == 'ready':
+                try:
+                    illustrator = Illustrator.new(rank=int(line))
+                    state = 'keywords'
+                except ValueError:
+                    continue
+            elif state == 'keywords':
+                if line:
+                    illustrator.keywords = line.strip().split('、')
+                state = 'name'
+            elif state == 'name':
+                illustrator.name = line.strip()
+                state = 'last'
+            elif state == 'last':
+                if line.startswith('http'):
+                    illustrator.urls.append(line.strip())
+                elif line:
+                    category, rank = line.replace('：', ':').split(':')
+                    illustrator.categoryRanks[category] = int(rank)
+                else:
+                    illustrators.append(illustrator)
+                    illustrator = None
+                    state = 'ready'
+        if illustrator:
+            illustrators.append(illustrator)
+        return illustrators
