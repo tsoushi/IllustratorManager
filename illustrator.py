@@ -85,7 +85,7 @@ class Illustrator:
 
     # テキストからインスタンスを一括作成
     @staticmethod
-    def fromText(text):
+    def newFromText(text):
         lines = text.split('\n')
         state = 'ready'
         illustrators = []
