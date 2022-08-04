@@ -4,7 +4,7 @@ import json
 import utility
 
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('Log').getChild('Database')
 
 DBPATH = 'data.db'
 SCHEMA_PATH = 'schema.sql'
@@ -47,10 +47,10 @@ def updateIllustrator(id: int, name: str, urls: list, rank: int, keywords: list,
     with sqlite3.connect(DBPATH) as db:
         logger.debug('committing to database')
         db.execute(
-            'UPDATE illustrators SET name = ?, urls = ?, rank = ?, keywords = ?, categoryRanks = ?, updated_at = DATETIME(CURRENT_TIMESTAMP, "localtime") WHERE id = ?',
+            'UPDATE illustrators SET name = ?, urls = ?, rank = ?, keywords = ?, category_ranks = ?, updated_at = DATETIME(CURRENT_TIMESTAMP, "localtime") WHERE id = ?',
             (name, urls, rank, keywords, categoryRanks, id)
         )
-        updatedAt = db.execute('SELECT id FROM illustrators WHERE id = ?', (id,)).fetchone()[0]
+        updatedAt = db.execute('SELECT updated_at FROM illustrators WHERE id = ?', (id,)).fetchone()[0]
         updatedAt = utility.textToDatetime(updatedAt)
         db.commit()
     logger.debug('update illustrator -> complete')

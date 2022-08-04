@@ -3,6 +3,9 @@ import json
 import utility
 import database
 
+import logging
+logger = logging.getLogger('Log').getChild('Illustrator')
+
 class Illustrator:
     def __init__(self, name, urls, rank, keywords, categoryRanks):
         self.id = None
@@ -12,8 +15,37 @@ class Illustrator:
         self.keywords = keywords
         self.categoryRanks = categoryRanks
 
+    # 変更を保存する(新規作成、更新問わず)
     def save(self):
-        pass
+        if self.id:
+            self._updateDb()
+        else:
+            self._addToDb()
+    
+    # データベースに新規追加する
+    def _addToDb(self):
+        id, createdAt, updatedAt = database.addIllustrator(
+            name = self.name,
+            urls = self.urls,
+            rank = self.rank,
+            keywords = self.keywords,
+            categoryRanks = self.categoryRanks
+        )
+        self.id = id
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+
+    # 変更内容をデータベースに保存する
+    def _updateDb(self):
+        updatedAt = database.updateIllustrator(
+            id = self.id,
+            name = self.name,
+            urls = self.urls,
+            rank = self.rank,
+            keywords = self.keywords,
+            categoryRanks = self.categoryRanks
+        )
+        self.updatedAt = updatedAt
     
     # 新規作成
     @staticmethod
@@ -34,7 +66,6 @@ class Illustrator:
     @staticmethod
     def fromDbRow(row):
         illustrator = Illustrator(
-            id = row[0],
             name = row[1],
             urls = json.loads(row[2]),
             rank = row[3],
@@ -42,8 +73,8 @@ class Illustrator:
             categoryRanks = json.loads(row[5]),
         )
         illustrator.id = row[0]
-        illustrator.createdAt = utility.textToDatetime(row[6]),
-        illustrator.updatedAt = utility.textToDatetime(row[7]),
+        illustrator.createdAt = utility.textToDatetime(row[6])
+        illustrator.updatedAt = utility.textToDatetime(row[7])
         return illustrator
 
     
