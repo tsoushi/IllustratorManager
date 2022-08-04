@@ -68,3 +68,9 @@ def getRowFromId(databaseId):
     else:
         logger.debug('get row from id -> not found -> complete')
         return None
+
+def removeRowById(id: int):
+    logger.debug('remove row by id')
+    with sqlite3.connect(DBPATH) as db:
+        db.execute('DELETE FROM illustrators WHERE id = ?', (id,))
+    logger.debug('remove row by id -> complete')

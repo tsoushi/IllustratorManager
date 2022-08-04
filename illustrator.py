@@ -51,6 +51,11 @@ class Illustrator:
     @staticmethod
     def initDb():
         database.initDb()
+    
+    # データベースから指定したIDのイラストレータの情報を削除
+    @staticmethod
+    def removeById(id):
+        database.removeRowById(id)
 
     # 新規作成
     @staticmethod
