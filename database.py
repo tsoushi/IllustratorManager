@@ -20,9 +20,9 @@ def initDb():
 # 新しいイラストレーターを追加する
 def addIllustrator(name: str, urls: list, rank: int, keywords: list, categoryRanks: dict):
     logger.debug('add illustrator')
-    urls = json.dumps(urls)
-    keywords = json.dumps(keywords)
-    categoryRanks = json.dumps(categoryRanks)
+    urls = json.dumps(urls, ensure_ascii=False)
+    keywords = json.dumps(keywords, ensure_ascii=False)
+    categoryRanks = json.dumps(categoryRanks, ensure_ascii=False)
 
     with sqlite3.connect(DBPATH) as db:
         logger.debug('committing to database')
@@ -41,9 +41,9 @@ def addIllustrator(name: str, urls: list, rank: int, keywords: list, categoryRan
 # イラストレーターの情報を更新する
 def updateIllustrator(id: int, name: str, urls: list, rank: int, keywords: list, categoryRanks: dict):
     logger.debug('update illustrator')
-    urls = json.dumps(urls)
-    keywords = json.dumps(keywords)
-    categoryRanks = json.dumps(categoryRanks)
+    urls = json.dumps(urls, ensure_ascii=False)
+    keywords = json.dumps(keywords, ensure_ascii=False)
+    categoryRanks = json.dumps(categoryRanks, ensure_ascii=False)
     with sqlite3.connect(DBPATH) as db:
         logger.debug('committing to database')
         db.execute(
