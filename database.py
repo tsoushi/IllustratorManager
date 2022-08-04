@@ -1,7 +1,7 @@
 import sqlite3
 import json
 
-from .illustrator import Illustrator
+import utility
 
 import logging
 logger = logging.getLogger(__name__)
@@ -18,13 +18,11 @@ def initDb():
         logger.info('initialize database -> complete')
 
 # 新しいイラストレーターを追加する
-def addIllustrator(illustrator: Illustrator):
+def addIllustrator(name: str, urls: list, rank: int, keywords: list, categoryRanks: dict):
     logger.debug('add illustrator')
-    name = illustrator.name
-    urls = json.dumps(illustrator.urls)
-    rank = illustrator.rank
-    keywords = json.dumps(illustrator.keywords)
-    categoryRanks = json.dumps(illustrator.categoryRanks)
+    urls = json.dumps(urls)
+    keywords = json.dumps(keywords)
+    categoryRanks = json.dumps(categoryRanks)
 
     with sqlite3.connect(DBPATH) as db:
         logger.debug('committing to database')
@@ -32,16 +30,41 @@ def addIllustrator(illustrator: Illustrator):
             'INSERT INTO illustrators(name, urls, rank, keywords, category_ranks) VALUES(?, ?, ?, ?, ?)',
             (name, urls, rank, keywords, categoryRanks)
         )
+        id, createdAt, updatedAt = db.execute('SELECT id, created_at, updated_at FROM illustrators ORDER BY id DESC LIMIT 1;').fetchone()
+        createdAt = utility.textToDatetime(createdAt)
+        updatedAt = utility.textToDatetime(updatedAt)
+        db.commit()
     logger.debug('add illustrator -> complete')
 
+    return id, createdAt, updatedAt
+
+# イラストレーターの情報を更新する
+def updateIllustrator(id: int, name: str, urls: list, rank: int, keywords: list, categoryRanks: dict):
+    logger.debug('update illustrator')
+    urls = json.dumps(urls)
+    keywords = json.dumps(keywords)
+    categoryRanks = json.dumps(categoryRanks)
+    with sqlite3.connect(DBPATH) as db:
+        logger.debug('committing to database')
+        db.execute(
+            'UPDATE illustrators SET name = ?, urls = ?, rank = ?, keywords = ?, categoryRanks = ?, updated_at = DATETIME(CURRENT_TIMESTAMP, "localtime") WHERE id = ?',
+            (name, urls, rank, keywords, categoryRanks, id)
+        )
+        updatedAt = db.execute('SELECT id FROM illustrators WHERE id = ?', (id,)).fetchone()[0]
+        updatedAt = utility.textToDatetime(updatedAt)
+        db.commit()
+    logger.debug('update illustrator -> complete')
+
+    return updatedAt
+
 # idからイラストレーターを取得する
-def getIllustratorFromId(databaseId):
-    logger.debug('get illustrator from id')
+def getRowFromId(databaseId):
+    logger.debug('get row from id')
     with sqlite3.connect(DBPATH) as db:
         data = db.execute('SELECT * FROM illustrators WHERE id = ?;', (databaseId,)).fetchone()
     if data:
-        logger.debug('get illustrator from id -> complete')
-        return Illustrator.fromSqlRow(data)
+        logger.debug('get row from id -> complete')
+        return data
     else:
-        logger.debug('get illustrator from id -> not found -> complete')
+        logger.debug('get row from id -> not found -> complete')
         return None
