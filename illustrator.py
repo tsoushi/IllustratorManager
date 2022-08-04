@@ -47,6 +47,11 @@ class Illustrator:
         )
         self.updatedAt = updatedAt
     
+    # データベースの初期化
+    @staticmethod
+    def initDb():
+        database.initDb()
+
     # 新規作成
     @staticmethod
     def new(name='', urls=None, rank=-1, keywords=None, categoryRanks=None):
