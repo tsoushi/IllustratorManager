@@ -49,7 +49,13 @@ class Illustrator:
     
     # 新規作成
     @staticmethod
-    def new(name, urls=[], rank=-1, keywords=[], categoryRanks={}):
+    def new(name, urls=None, rank=-1, keywords=None, categoryRanks=None):
+        if urls is None:
+            urls = []
+        if keywords is None:
+            keywords = []
+        if categoryRanks is None:
+            categoryRanks = {}
         illustrator = Illustrator(name, urls, rank, keywords, categoryRanks)
         return illustrator
 
