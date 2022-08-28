@@ -151,7 +151,7 @@ def main():
                 illustrator.keywords.extend(args.add_keywords)
                 print(illustrator.keywords)
             elif args.remove_keywords:
-                print(f'urls : {illustrator.keywords} => ', end='')
+                print(f'keywords : {illustrator.keywords} => ', end='')
                 for keyword in args.remove_keywords:
                     try:
                         illustrator.keywords.remove(keyword)
@@ -169,7 +169,7 @@ def main():
                     illustrator.categoryRanks[category] = int(rank)
                 print(illustrator.categoryRanks)
             elif args.remove_category_ranks:
-                print(f'urls : {illustrator.categoryRanks} => ', end='')
+                print(f'categoryRanks : {illustrator.categoryRanks} => ', end='')
                 for category in args.remove_category_ranks:
                     try:
                         illustrator.categoryRanks.pop(category)
