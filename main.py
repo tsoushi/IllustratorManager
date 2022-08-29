@@ -127,7 +127,7 @@ def main():
                 illustrator.name = args.name
 
             if args.rank:
-                print(f'rank : illustrator.rank => {args.rank}')
+                print(f'rank : {illustrator.rank} => {args.rank}')
                 illustrator.rank = args.rank
 
             if args.add_urls:
