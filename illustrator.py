@@ -78,6 +78,12 @@ class Illustrator:
         else:
             return None
     
+    # データベースのすべてのデータからインスタンスを作成
+    @staticmethod
+    def getAll(limit=0):
+        records = database.getAllIllustrators(limit=limit)
+        return [Illustrator.fromDbRow(record) for record in records]
+    
     # データベースの行データをもとにインスタンスを作成
     @staticmethod
     def fromDbRow(row):

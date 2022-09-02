@@ -69,6 +69,18 @@ def getRowFromId(databaseId):
         logger.debug('get row from id -> not found -> complete')
         return None
 
+# すべてのイラストレーター情報を取得する
+def getAllIllustrators(limit=0):
+    logger.debug('get all illustrators')
+    with sqlite3.connect(DBPATH) as db:
+        if limit > 0:
+            records = db.execute('SELECT * FROM illustrators LIMIT ?;', limit).fetchall()
+        else:
+            records = db.execute('SELECT * FROM illustrators;').fetchall()
+
+    logger.debug(f'get all illustrators -> complete ({len(records)} records)')
+    return records
+
 def removeRowById(id: int):
     logger.debug('remove row by id')
     with sqlite3.connect(DBPATH) as db:
