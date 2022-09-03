@@ -31,7 +31,13 @@ class Illustrator:
         else:
             logger.warn('remove from database -> not saved')
             raise Exception('not saved in database')
-            
+    
+    # データベースに保存されているか
+    def isSaved(self):
+        if self.id is not None:
+            return True
+        else:
+            return False
     
     # データベースに新規追加する
     def _addToDb(self):
