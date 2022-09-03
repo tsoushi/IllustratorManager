@@ -22,6 +22,17 @@ class Illustrator:
         else:
             self._addToDb()
     
+    # データベースから削除する
+    def remove(self):
+        logger.info(f'remove from database : id = {self.id}')
+        if self.id:
+            database.removeRowById(self.id)
+            logger.info(f'remove from database -> complete')
+        else:
+            logger.warn('remove from database -> not saved')
+            raise Exception('not saved in database')
+            
+    
     # データベースに新規追加する
     def _addToDb(self):
         id, createdAt, updatedAt = database.addIllustrator(
