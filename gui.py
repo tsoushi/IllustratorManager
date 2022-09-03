@@ -76,6 +76,8 @@ class Editor(tkinter.Toplevel):
         self.illustrator = illustrator
         self.updateEvent = updateEvent
 
+        ENTRY_WIDTH = 50
+
         # IDフレーム
         idFrame = tkinter.Frame(self)
         tkinter.Label(idFrame, text='ID', width=10).grid(column=0, row=0)
@@ -88,24 +90,42 @@ class Editor(tkinter.Toplevel):
         # 名前フレーム
         nameFrame = tkinter.Frame(self)
         tkinter.Label(nameFrame, text='名前', width=10).grid(column=0, row=0)
-        self.nameEntry = tkinter.Entry(nameFrame)
+        self.nameEntry = tkinter.Entry(nameFrame, width=ENTRY_WIDTH)
         self.nameEntry.insert('0', illustrator.name)
         self.nameEntry.grid(column=1, row=0)
 
         # ランクフレーム
         rankFrame = tkinter.Frame(self)
         tkinter.Label(rankFrame, text='ランク', width=10).grid(column=0, row=0)
-        self.rankEntry = tkinter.Entry(rankFrame)
+        self.rankEntry = tkinter.Entry(rankFrame, width=ENTRY_WIDTH)
         self.rankEntry.insert('0', illustrator.rank)
         self.rankEntry.grid(column=1, row=0)
 
         # キーワードフレーム
         keywordFrame = tkinter.Frame(self)
         tkinter.Label(keywordFrame, text='キーワード', width=10).grid(column=0, row=0)
-        keywordListFrame = KeywordListFrame(keywordFrame, illustrator.keywords)            
-        keywordListFrame.grid(column=1, row=0)
-        self.keywordListFrame = keywordListFrame
+        self.keywordTextbox = tkinter.Text(keywordFrame, width=ENTRY_WIDTH, height=10)
+        self.keywordTextbox.insert('1.0', '\n'.join(illustrator.keywords))
+        self.keywordTextbox.grid(column=1, row=0)
 
+        # URLフレーム
+        URLFrame = tkinter.Frame(self)
+        tkinter.Label(URLFrame, text='URL', width=10).grid(column=0, row=0)
+        self.URLTextbox = tkinter.Text(URLFrame, width=ENTRY_WIDTH, height=10)
+        self.URLTextbox.insert('1.0', '\n'.join(illustrator.urls))
+        self.URLTextbox.grid(column=1, row=0)
+
+        # カテゴリ別ランクフレーム
+        categoryRankFrame = tkinter.Frame(self)
+        tkinter.Label(categoryRankFrame, text='カテゴリ別ランク', width=10).grid(column=0, row=0)
+        self.categoryRankTextbox = tkinter.Text(categoryRankFrame, width=ENTRY_WIDTH, height=10)
+        self.categoryRankTextbox.insert('1.0', 
+            '\n'.join(
+                ['{}:{}'.format(i[0], i[1]) for i in illustrator.categoryRanks.items()]
+            )
+        )
+        self.categoryRankTextbox.grid(column=1, row=0)
+        
         # 操作フレーム
         controlFrame = tkinter.Frame(self)
         tkinter.Button(controlFrame, text='キャンセル', command=self.destroy).grid(column=0, row=0)
@@ -117,6 +137,8 @@ class Editor(tkinter.Toplevel):
         nameFrame.pack()
         rankFrame.pack()
         keywordFrame.pack()
+        URLFrame.pack()
+        categoryRankFrame.pack()
         controlFrame.pack()
 
     # データを削除する
@@ -128,47 +150,27 @@ class Editor(tkinter.Toplevel):
             self.destroy()
             
     def updateRecord(self):
-        self.illustrator.name = self.nameEntry.get()
-        self.illustrator.rank = int(self.rankEntry.get())
-        self.illustrator.keywords = self.keywordListFrame.getKeywords()
-        self.illustrator.save()
+        try:
+            self.illustrator.name = self.nameEntry.get()
+            self.illustrator.rank = int(self.rankEntry.get())
+            self.illustrator.keywords = self.keywordTextbox.get('1.0', tkinter.END)[:-1].split('\n')
+            self.illustrator.urls = self.URLTextbox.get('1.0', tkinter.END)[:-1].split('\n')
+            self.illustrator.categoryRanks = {
+                i.split(':')[0]:int(i.split(':')[1])
+                for i in self.categoryRankTextbox.get('1.0', tkinter.END)[:-1].split('\n')
+                if i != ''
+            }
+        except Exception as e:
+            messagebox.showwarning('warning', f'{e}\n\n保存に失敗しました。入力形式が間違っている可能性があります。')
+            return
+        try:
+            self.illustrator.save()
+        except Exception:
+            messagebox.showerror('error', f'{e}\n\nデータベースへの書き込みに失敗しました')
+            return
         if self.updateEvent:
             self.updateEvent()
         self.destroy()
-
-# 編集ウィドウ内のキーワードリストフレーム
-class KeywordListFrame(tkinter.Frame):
-    def __init__(self, master, keywords):
-        super().__init__(master)
-
-        self.entries = []
-        for keyword in keywords:
-            self.addKeyword(keyword)
-        
-        tkinter.Button(self, text='追加', command=self.addKeyword).pack()
-
-    # キーワード入力項目を追加する
-    def addKeyword(self, keyword=''):
-        frame = tkinter.Frame(self)
-        entry = tkinter.Entry(frame)
-        entry.insert('0', keyword)
-        entry.grid(column=0, row=0)
-        self.entries.append(entry)
-        tkinter.Button(frame, text='削除', command=self.deleteFunc(frame, entry)).grid(column=1, row=0)
-        frame.pack()
-
-    # キーワードの削除ボタンを押したときの動作
-    def deleteFunc(self, frame, entry):
-        def func():
-            self.entries.remove(entry)
-            frame.destroy()
-        return func
-
-    def getKeywords(self):
-        keywords = []
-        for entry in self.entries:
-            keywords.append(entry.get())
-        return keywords
 
 if __name__ == '__main__':
     window = tkinter.Tk()
