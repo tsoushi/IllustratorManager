@@ -153,8 +153,8 @@ class Editor(tkinter.Toplevel):
         try:
             self.illustrator.name = self.nameEntry.get()
             self.illustrator.rank = int(self.rankEntry.get())
-            self.illustrator.keywords = self.keywordTextbox.get('1.0', tkinter.END)[:-1].split('\n')
-            self.illustrator.urls = self.URLTextbox.get('1.0', tkinter.END)[:-1].split('\n')
+            self.illustrator.keywords = [i for i in self.keywordTextbox.get('1.0', tkinter.END)[:-1].split('\n') if i != '']
+            self.illustrator.urls = [i for i in self.URLTextbox.get('1.0', tkinter.END)[:-1].split('\n') if i != '']
             self.illustrator.categoryRanks = {
                 i.split(':')[0]:int(i.split(':')[1])
                 for i in self.categoryRankTextbox.get('1.0', tkinter.END)[:-1].split('\n')
