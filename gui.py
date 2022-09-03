@@ -42,7 +42,7 @@ class IllustratorListbox(tkinter.Listbox):
         self.delete(0, tkinter.END)
         self.records = []
         for illustrator in Illustrator.getAll():
-            self.insert(tkinter.END, illustrator.name)
+            self.insert(tkinter.END, f'[{illustrator.rank}] {illustrator.name}')
             self.records.append(illustrator)
 
     # ダブルクリック
@@ -99,15 +99,24 @@ class Editor(tkinter.Toplevel):
         self.rankEntry.insert('0', illustrator.rank)
         self.rankEntry.grid(column=1, row=0)
 
+        # キーワードフレーム
+        keywordFrame = tkinter.Frame(self)
+        tkinter.Label(keywordFrame, text='キーワード', width=10).grid(column=0, row=0)
+        keywordListFrame = KeywordListFrame(keywordFrame, illustrator.keywords)            
+        keywordListFrame.grid(column=1, row=0)
+        self.keywordListFrame = keywordListFrame
+
         # 操作フレーム
         controlFrame = tkinter.Frame(self)
         tkinter.Button(controlFrame, text='キャンセル', command=self.destroy).grid(column=0, row=0)
         tkinter.Button(controlFrame, text='削除', command=self.remove).grid(column=1, row=0)
         tkinter.Button(controlFrame, text='決定', command=self.updateRecord).grid(column=2, row=0)
 
+
         idFrame.pack()
         nameFrame.pack()
         rankFrame.pack()
+        keywordFrame.pack()
         controlFrame.pack()
 
     # データを削除する
@@ -121,10 +130,45 @@ class Editor(tkinter.Toplevel):
     def updateRecord(self):
         self.illustrator.name = self.nameEntry.get()
         self.illustrator.rank = int(self.rankEntry.get())
+        self.illustrator.keywords = self.keywordListFrame.getKeywords()
         self.illustrator.save()
         if self.updateEvent:
             self.updateEvent()
         self.destroy()
+
+# 編集ウィドウ内のキーワードリストフレーム
+class KeywordListFrame(tkinter.Frame):
+    def __init__(self, master, keywords):
+        super().__init__(master)
+
+        self.entries = []
+        for keyword in keywords:
+            self.addKeyword(keyword)
+        
+        tkinter.Button(self, text='追加', command=self.addKeyword).pack()
+
+    # キーワード入力項目を追加する
+    def addKeyword(self, keyword=''):
+        frame = tkinter.Frame(self)
+        entry = tkinter.Entry(frame)
+        entry.insert('0', keyword)
+        entry.grid(column=0, row=0)
+        self.entries.append(entry)
+        tkinter.Button(frame, text='削除', command=self.deleteFunc(frame, entry)).grid(column=1, row=0)
+        frame.pack()
+
+    # キーワードの削除ボタンを押したときの動作
+    def deleteFunc(self, frame, entry):
+        def func():
+            self.entries.remove(entry)
+            frame.destroy()
+        return func
+
+    def getKeywords(self):
+        keywords = []
+        for entry in self.entries:
+            keywords.append(entry.get())
+        return keywords
 
 if __name__ == '__main__':
     window = tkinter.Tk()
