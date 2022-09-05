@@ -71,7 +71,7 @@ def main():
         if args.categoryRanks is None:
             categoryRanks = {}
         else:
-            categoryRanks = {i.split('=')[0]: i.split('=')[1] for i in args.categoryRanks},
+            categoryRanks = {i.split('=')[0]: i.split('=')[1] for i in args.categoryRanks}
 
         illustrator = Illustrator.new(
             name = name,
