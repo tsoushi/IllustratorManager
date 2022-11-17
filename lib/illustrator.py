@@ -1,7 +1,7 @@
 import json
 
-import utility
-import database
+from . import utility
+from . import database
 
 import logging
 logger = logging.getLogger('Log').getChild('Illustrator')

@@ -1,7 +1,7 @@
 import tkinter
 from tkinter import messagebox
 
-from illustrator import Illustrator
+from lib.illustrator import Illustrator
 
 # メインフレーム
 class App(tkinter.Frame):

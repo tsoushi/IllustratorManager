@@ -1,7 +1,7 @@
 import sqlite3
 import json
 
-import utility
+from . import utility
 
 import logging
 logger = logging.getLogger('Log').getChild('Database')

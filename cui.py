@@ -1,4 +1,4 @@
-from illustrator import Illustrator
+from lib.illustrator import Illustrator
 
 import logging
 logger = logging.getLogger('Log')
